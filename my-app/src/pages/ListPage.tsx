@@ -1,40 +1,42 @@
-import { usestate } from 'react';
+import { useEffect, useState } from 'react';
+import { Entry, readEntries } from '../lib/data';
 
 export default function ListPage() {
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<unknown>();
+  const [entries, setEntries] = useState<Entry[]>([]);
+
+  useEffect(() =>{
+    async function loadItems() {
+      try {
+        const value = await readEntries();
+        setEntries(value);
+      }catch(error){
+        setError(error);
+      }finally{
+        setIsLoading(false);
+      }
+    }
+    loadItems();
+} ,[]);
+
+if (isLoading){
+  return <div>Loading ...</div>
+}
+
+if (error){
   return (
-    <main className="container">
-      <div data-view="entry-form" className="entry-form-wrapper hidden">
-        <form id="entry-form">
-          <div className="column-full">
-            <h1 className="new-entry-header">New Entry</h1>
-          </div>
-          <div className="row">
-            <div className="photo-wrapper column-half">
-              <img
-                id="entry-image"
-                src="images/placeholder-image-square.jpg"
-                alt="Placeholder image"
-              />
-            </div>
-            <div className="column-half">
-              <label>Title</label>
-              <input id="title" type="text" name="title" required />
-              <label>Photo URL</label>
-              <input id="photo-url" type="url" name="photoUrl" required />
-            </div>
-            <div className="column-full">
-              <label>Notes</label>
-              <textarea name="notes" id="notes" required></textarea>
-              <div className="form-actions">
-                <button className="delete-button hide" type="button">
-                  Delete Entry
-                </button>
-                <button type="submit">Save</button>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-    </main>
+    <div>Error! {error instanceof Error? error.message : "Unknown Error"}</div>
   );
 }
+
+  return (
+    <>
+    {!entries ? (
+      <p className="no-entries-text">No entries have been recorded</p>
+    ) : (
+      <ul className="entry-list"></ul>
+    )}
+  </>
+)};
