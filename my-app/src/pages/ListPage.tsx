@@ -35,12 +35,11 @@ export default function ListPage() {
 
     return (
       <>
-        {!entries ? (
+        {entries.length === 0 ? (
           <p className="no-entries-text">No entries have been recorded</p>
         ) : (
-          <ul className="entry-list"></ul>
+          <ul className="entry-list">There are some entries</ul>
         )}
       </>
     );
   }
-
