@@ -1,32 +1,50 @@
 import { FormEvent } from 'react';
-import { UnsavedEntry } from '../lib/data';
+import { readEntry, UnsavedEntry } from '../lib/data';
 import { addEntry } from '../lib/data';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 /*type UnsavedEntry = {
   photoUrl?: string;
   title?: string;
   notes?: string;
 }*/
 
-
 export function EntryPage() {
   const navigate = useNavigate();
   const [photoUrl, setPhotoUrl] = useState('');
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<unknown>();
+  const [entry, setEntry] = useState();
+  const { entryId } = useParams();
+
+  useEffect(() => {
+    async function loadItems() {
+      try {
+        const value = await readEntry(+entryId);
+        setEntry(value);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadItems();
+  }, []);
+
+
   const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  const entry: UnsavedEntry = {photoUrl, title, notes};
+    const entry: UnsavedEntry = { photoUrl, title, notes };
 
-  try {
-     await addEntry(entry);
-     navigate("/entries");
-  }catch(error){
-    alert(error)
-    console.log(error)
-  }
-
+    try {
+      await addEntry(entry);
+      navigate('/entries');
+    } catch (error) {
+      alert(error);
+      console.log(error);
+    }
   };
 
   // export function EntryPage(){
@@ -67,15 +85,27 @@ export function EntryPage() {
     <>
       <form onSubmit={handleSave}>
         <img src="../images/placeholder-image-square.jpg" />
-        <input name="photoUrl" type="text" value={photoUrl} onChange={(e)=>setPhotoUrl(e.target.value)}></input>
+        <input
+          name="photoUrl"
+          type="text"
+          value={photoUrl}
+          onChange={(e) => setPhotoUrl(e.target.value)}></input>
 
         <label>
           Title:
-          <input name="title" type="text" value={title} onChange={(e)=>setTitle(e.target.value)}></input>
+          <input
+            name="title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}></input>
         </label>
         <label>
           Notes:
-          <input name="notes" type="textarea" value={notes} onChange={(e)=>setNotes(e.target.value)}></input>
+          <input
+            name="notes"
+            type="textarea"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}></input>
         </label>
 
         <button type="submit">Save</button>

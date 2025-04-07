@@ -37,7 +37,6 @@
   }
 }
 
-
 /* styles */
 
 body {
@@ -122,7 +121,7 @@ ul {
   padding: 0;
 }
 
-a {
+.nav-item {
   text-decoration: none;
   color: white;
 }
@@ -170,3 +169,6 @@ dialog::backdrop {
   color: black;
 }
 
+img {
+  width: 50%;
+}
